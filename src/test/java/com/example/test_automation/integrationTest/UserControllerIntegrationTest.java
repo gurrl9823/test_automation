@@ -40,18 +40,13 @@ class UserControllerIntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Test
     void testGetUserInfo() {
-        // DB에 테스트 데이터 삽입
-        userRepository.save(new com.example.프로젝트명.User(1L, "혁기"));
 
-        String url = "http://localhost:" + port + "/user/info/1";
+        String url = "http://localhost:" + port + "/user/info/123456";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("혁기");
+        assertThat(response.getBody()).isEqualTo("홍길동 25세");
     }
 }
