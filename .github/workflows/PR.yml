@@ -44,6 +44,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gradle-test-report
-          path: build/reports/test/
+          path: build/reports/tests/test/
 
 
