@@ -4,6 +4,11 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  checks: write        # dorny/test-reporter가 체크를 생성하기 위해 필요
+#  pull-requests: write # PR 코멘트를 작성하기 위해 필요
+
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -36,17 +41,35 @@ jobs:
 
       # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
-        run: ./gradlew check
+        run: ./gradlew check --continue
 
       # 7. index.html로 확인하기 위한 Test Report 업로드
       - name: Upload Test Report
         if: always() # 테스트가 실패하더라도 항상 리포트를 업로드
         uses: actions/upload-artifact@v4
         with:
-          name: gradle-test-report
+          name: test-report
           path: build/reports/tests/test/
 
-      # 8. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
+      # 8. 테스트 리포트 업로드
+      - name: Upload JaCoCo Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
+
+      # 9. 테스트 실행 결과를 PR 코멘트로 게시
+      - name: Report Test Results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit Tests # 리포트 이름
+          path: "build/test-results/test/*.xml" # Gradle 테스트 결과 XML 파일 경로
+          reporter: java-junit # 리포트 형식
+          fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
+
+      # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
       - name: Add JaCoCo Report to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
@@ -55,11 +78,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "테스트 커버리지 리포트"
 
-      # 9. 리포트 업로드
-      - name: Upload JaCoCo Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-html-report
-          path: build/reports/jacoco/test/html
 
