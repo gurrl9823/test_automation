@@ -34,9 +34,9 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew build -x test
 
-      # 6. 테스트 실행 (단위 + 통합)
+      # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
-        run: ./gradlew test
+        run: ./gradlew check
 
       # 7. index.html로 확인하기 위한 Test Report 업로드
       - name: Upload Test Report
@@ -46,4 +46,20 @@ jobs:
           name: gradle-test-report
           path: build/reports/tests/test/
 
+      # 8. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
+      - name: Add JaCoCo Report to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "테스트 커버리지 리포트"
+
+      # 9. 리포트 업로드
+      - name: Upload JaCoCo Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html-report
+          path: build/reports/jacoco/test/html
 
