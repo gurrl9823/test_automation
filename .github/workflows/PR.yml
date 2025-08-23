@@ -64,7 +64,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: JUnit Tests # 리포트 이름
-          path: "build/test-results/test/*.xml" # Gradle 테스트 결과 XML 파일 경로
+          path: "build/test-results/test/TEST-*.xml" # Gradle 테스트 결과 XML 파일 경로
           reporter: java-junit # 리포트 형식
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
 
