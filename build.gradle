@@ -69,7 +69,7 @@ tasks.named('test') {
 // JaCoCo 리포트 생성 작업(Task) 설정
 tasks.named('jacocoTestReport') {
     // test 작업이 성공적으로 끝나야 이 작업이 실행됨
-//    dependsOn tasks.named('test')
+    dependsOn tasks.named('test')
 
     reports {
         // 리포트 형식 설정
