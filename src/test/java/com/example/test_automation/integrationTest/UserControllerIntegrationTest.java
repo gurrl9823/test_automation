@@ -1,6 +1,6 @@
 package com.example.test_automation.integrationTest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:integrationTest/application-integration.yml")
-class UserControllerIntegrationTest {
+public class UserControllerIntegrationTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
@@ -41,7 +41,7 @@ class UserControllerIntegrationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void testGetUserInfo() {
+    public void testGetUserInfo() {
 
         String url = "http://localhost:" + port + "/user/info/123456";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);

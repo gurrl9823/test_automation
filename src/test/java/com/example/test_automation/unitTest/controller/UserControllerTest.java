@@ -1,5 +1,6 @@
-package com.example.test_automation.controller;
+package com.example.test_automation.unitTest.controller;
 
+import com.example.test_automation.controller.UserController;
 import com.example.test_automation.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
