@@ -45,30 +45,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// 🔹 통합 테스트 소스셋
-sourceSets {
-    integrationTest {
-        java.srcDir file("src/test/java/com/example/test_automation/integrationTest")
-        resources.srcDir file("src/test/resources/integrationTest")
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
-    }
-}
-
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-tasks.register('integrationTest', Test) {
-    description = "Run integration tests"
-    group = "verification"
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    shouldRunAfter tasks.test
-    useJUnitPlatform()
-}
-
 tasks.named('test') {
     useJUnitPlatform()
 }
