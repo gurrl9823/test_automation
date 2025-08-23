@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
-//    id 'jacoco' // JaCoCo 플러그인 추가
+    id 'jacoco' // JaCoCo 플러그인 추가
 }
 
 group = 'com.example'
@@ -15,9 +15,9 @@ java {
     }
 }
 
-//jacoco {
-//    toolVersion = "0.8.12" // JaCoCo 버전 명시
-//}
+jacoco {
+    toolVersion = "0.8.12" // JaCoCo 버전 명시
+}
 
 configurations {
     compileOnly {
@@ -62,6 +62,75 @@ tasks.named('test') {
         showStackTraces true
     }
 
-//    // 3. 테스트 실행 시 JaCoCo 에이전트가 실행 데이터를 수집하도록 보장
-//    finalizedBy tasks.named('jacocoTestReport')
+    // 테스트 실행 시 JaCoCo 에이전트가 실행 데이터를 수집하도록 보장
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+// JaCoCo 리포트 생성 작업(Task) 설정
+tasks.named('jacocoTestReport') {
+    // test 작업이 성공적으로 끝나야 이 작업이 실행됨
+    dependsOn tasks.named('test')
+
+    reports {
+        // 리포트 형식 설정
+        xml.required = true  // CI 연동(GitHub Action)을 위해 XML 리포트가 꼭 필요함
+        html.required = true // 사람이 브라우저에서 볼 HTML 리포트
+        csv.required = false // CSV 리포트는 보통 불필요
+    }
+
+    // 커버리지 측정에서 제외할 파일들 지정 (선택 사항)
+    def excludes = [
+            '**/*Application.class',
+            '**/config/**',
+            // DTO, Entity 등 순수 데이터 클래스 제외 가능
+            '**/dto/**',
+            '**/entity/**'
+    ]
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: excludes)
+    }))
+
+    // 소스 코드 경로 설정 (리포트에서 소스 하이라이팅을 위해 필요)
+    sourceDirectories.setFrom(files(sourceSets.main.allSource.srcDirs))
+}
+
+// JaCoCo 커버리지 검증 작업(Task) 설정
+tasks.named('jacocoTestCoverageVerification') {
+    // jacocoTestReport 작업이 끝나야 이 작업이 실행됨
+    dependsOn tasks.named('jacocoTestReport')
+
+    violationRules {
+        rule {
+            // 규칙을 적용할 단위 (클래스, 메서드, 라인 등)
+            element = 'CLASS'
+
+            // 메소드 커버리지: 놓친 메소드가 0개여야 함 (100% 커버)
+            limit {
+                counter = 'METHOD'
+                value = 'MISSEDCOUNT'
+                maximum = 0
+            }
+
+            // 브랜치 커버리지: 최소 60%를 만족해야 함
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO' // 비율로 측정
+                minimum = 0.60         // 최소 60% (0.0 ~ 1.0 사이 값)
+            }
+
+            // 검증에서 제외할 클래스들
+            excludes = [
+                    '*.*Application',
+                    '*.config.*',
+                    '*.dto.*',
+                    '*.entity.*'
+            ]
+        }
+    }
+}
+
+// 'check' 작업이 커버리지 검증을 포함하도록 연결
+// `./gradlew check` 실행 시 테스트와 동시에 커버리지 검증도 함께 수행함
+tasks.named('check') {
+    dependsOn tasks.named('jacocoTestCoverageVerification')
 }
