@@ -40,7 +40,7 @@ jobs:
 
       # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
-        run: ./gradlew check --continue
+        run: ./gradlew check
 
       # 7. index.html로 확인하기 위한 Test Report 업로드
       - name: Upload Test Report
