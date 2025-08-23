@@ -1,5 +1,6 @@
 package com.example.test_automation.integrationTest;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +42,7 @@ public class UserControllerIntegrationTest {
     private TestRestTemplate restTemplate;
 
     @Test
+    @DisplayName("/user/info 통합테스트")
     public void testGetUserInfo() {
 
         String url = "http://localhost:" + port + "/user/info/123456";
@@ -50,4 +52,3 @@ public class UserControllerIntegrationTest {
         assertThat(response.getBody()).isEqualTo("홍길동 25세");
     }
 }
-
