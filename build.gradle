@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
+//    id 'jacoco' // JaCoCo 플러그인 추가
 }
 
 group = 'com.example'
@@ -13,6 +14,10 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
+//jacoco {
+//    toolVersion = "0.8.12" // JaCoCo 버전 명시
+//}
 
 configurations {
     compileOnly {
@@ -48,7 +53,15 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 
+    // 테스트 상세 정보 출력
     testLogging {
         events "passed", "skipped", "failed"
+        exceptionFormat "full" // 예외에 대한 모든 정보 출력
+        showCauses true
+        showExceptions true
+        showStackTraces true
     }
+
+//    // 3. 테스트 실행 시 JaCoCo 에이전트가 실행 데이터를 수집하도록 보장
+//    finalizedBy tasks.named('jacocoTestReport')
 }
