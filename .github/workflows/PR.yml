@@ -42,5 +42,5 @@ jobs:
         run: ./gradlew build -x test
 
       # 6. 테스트 실행 (단위 + 통합)
-      - name: Run Unit Tests
+      - name: Run Tests
         run: ./gradlew test
