@@ -42,8 +42,19 @@ public class UserControllerIntegrationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    @DisplayName("/user/info 통합테스트")
-    public void testGetUserInfo() {
+    @DisplayName("/user/info 통합테스트1")
+    public void testGetUserInfo1() {
+
+        String url = "http://localhost:" + port + "/user/info/123456";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("홍길동 25세");
+    }
+
+    @Test
+    @DisplayName("/user/info 통합테스트2")
+    public void testGetUserInfo2() {
 
         String url = "http://localhost:" + port + "/user/info/123456";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);

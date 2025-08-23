@@ -37,3 +37,13 @@ jobs:
       # 6. 테스트 실행 (단위 + 통합)
       - name: Run Tests
         run: ./gradlew test
+
+      # 7. index.html로 확인하기 위한 Test Report 업로드
+      - name: Upload Test Report
+        if: always() # 테스트가 실패하더라도 항상 리포트를 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-test-report
+          path: build/reports/test/
+
+
