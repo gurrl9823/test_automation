@@ -40,7 +40,7 @@ jobs:
 
       # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
-        run: ./gradlew build --continue
+        run: ./gradlew check --continue
 
       # 7. index.html로 확인하기 위한 Test Report 업로드
       - name: Upload Test Report
@@ -66,6 +66,7 @@ jobs:
           name: JUnit Tests # 리포트 이름
           path: "build/test-results/test/TEST-*.xml" # Gradle 테스트 결과 XML 파일 경로
           reporter: java-junit # 리포트 형식
+          pr-comment: true
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
 
       # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
