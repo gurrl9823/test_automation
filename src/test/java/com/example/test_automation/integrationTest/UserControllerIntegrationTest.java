@@ -50,3 +50,4 @@ public class UserControllerIntegrationTest {
         assertThat(response.getBody()).isEqualTo("홍길동 25세");
     }
 }
+
