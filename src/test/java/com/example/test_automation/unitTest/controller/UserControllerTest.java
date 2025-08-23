@@ -36,7 +36,7 @@ class UserControllerTest {
         // When & Then
         mockMvc.perform(get("/user/info/{userId}", userId)) // GET 요청 시뮬레이션
                 .andExpect(status().isOk()) // 응답 상태가 200 OK인지 검증
-                .andExpect(content().string("잘못된 응답값")); // 응답 본문이 예상과 일치하는지 검증
+                .andExpect(content().string(userInfo)); // 응답 본문이 예상과 일치하는지 검증
     }
 
     @Test
