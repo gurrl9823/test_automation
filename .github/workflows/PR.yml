@@ -9,7 +9,7 @@ permissions:
   checks: write        # dorny/test-reporter가 체크를 생성하기 위해 필요
 
 jobs:
-  build-and-test:
+  build-and-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -68,6 +68,10 @@ jobs:
             exit 1
           fi
 
+  tests:
+    runs-on: ubuntu-latest
+    needs: build-and-scan
+    steps:
       # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
         run: ./gradlew check --continue
