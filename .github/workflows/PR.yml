@@ -36,6 +36,7 @@ jobs:
 
       # 5. Build (테스트 제외)
       - name: Build with Gradle Wrapper
+        id: build
         continue-on-error: true
         run: ./gradlew build -x test
 
