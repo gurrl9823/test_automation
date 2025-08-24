@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     public String getUserInfo(Long userId) {
-        String userKey = "123";
+        String userKey = "9aF8eB7dC6gH5iJ4kL3mN2oP1qR0sT";
         return "홍길동 25세";
     }
 }
