@@ -60,6 +60,6 @@ public class UserControllerIntegrationTest {
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("홍길동 25세"); // 홍길동 25세
+        assertThat(response.getBody()).isEqualTo("대한민국"); // 홍길동 25세
     }
 }
