@@ -205,6 +205,7 @@ jobs:
 
       # JaCoCo XML 리포트 파싱에 필요한 xmllint 도구 설치
       - name: Install xmllint
+        if: always()
         run: |
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
