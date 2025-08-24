@@ -42,11 +42,7 @@ jobs:
 
       # Gitleaks 실행 (Secret 하드코딩 탐지)
       - name: Run Gitleaks
-        id: gitleaks
-        uses: zricethezav/gitleaks-action@v1.0.8
-        continue-on-error: true
-        with:
-          args: "detect --source . --verbose"
+        uses: gitleaks/gitleaks-action@v2
 
       # Gitleaks 결과를 PR 코멘트로 게시
       - name: Comment Gitleaks Result
