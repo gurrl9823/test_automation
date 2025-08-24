@@ -193,15 +193,74 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
 
-      # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
-      - name: Add JaCoCo Report to PR
+#      # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
+#      - name: Add JaCoCo Report to PR
+#        id: jacoco
+#        if: always()
+#        uses: madrapps/jacoco-report@v1.6.1
+#        with:
+#          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          title: "테스트 커버리지 리포트"
+
+      # JaCoCo XML 리포트를 직접 파싱하여 커버리지 계산
+      - name: Parse JaCoCo Coverage Report
         id: jacoco
+        if: always() # 테스트 실패 여부와 관계없이 항상 실행
+        run: |
+          # xmllint 도구를 사용해 XML 파일에서 커버리지 데이터를 추출합니다.
+          METHOD_COVERED=$(xmllint --xpath 'string(//report/counter[@type="METHOD"]/@covered)' build/reports/jacoco/test/jacocoTestReport.xml)
+          METHOD_MISSED=$(xmllint --xpath 'string(//report/counter[@type="METHOD"]/@missed)' build/reports/jacoco/test/jacocoTestReport.xml)
+          BRANCH_COVERED=$(xmllint --xpath 'string(//report/counter[@type="BRANCH"]/@covered)' build/reports/jacoco/test/jacocoTestReport.xml)
+          BRANCH_MISSED=$(xmllint --xpath 'string(//report/counter[@type="BRANCH"]/@missed)' build/reports/jacoco/test/jacocoTestReport.xml)
+
+          # bc 도구를 사용해 소수점 계산을 수행합니다.
+          METHOD_TOTAL=$(echo "$METHOD_COVERED + $METHOD_MISSED" | bc)
+          if [ $METHOD_TOTAL -eq 0 ]; then
+            METHOD_PERCENT=100
+          else
+            METHOD_PERCENT=$(echo "scale=2; $METHOD_COVERED * 100 / $METHOD_TOTAL" | bc)
+          fi
+
+          BRANCH_TOTAL=$(echo "$BRANCH_COVERED + $BRANCH_MISSED" | bc)
+          if [ $BRANCH_TOTAL -eq 0 ]; then
+            BRANCH_PERCENT=100
+          else
+            BRANCH_PERCENT=$(echo "scale=2; $BRANCH_COVERED * 100 / $BRANCH_TOTAL" | bc)
+          fi
+
+          # 코멘트 메시지 본문을 생성합니다.
+          BODY="### 🧪 JaCoCo 테스트 커버리지\n\n"
+          BODY+="| 측정 항목 | 커버리지 |\n"
+          BODY+="|:---|:---|\n"
+          BODY+="| **메소드 (Methods)** | **${METHOD_PERCENT}%** |\n"
+          BODY+="| **브랜치 (Branches)** | **${BRANCH_PERCENT}%** |\n\n"
+
+          # build.gradle의 룰(최소 60%)과 비교하여 상태 메시지를 추가합니다.
+          # awk를 사용해 소수점 비교를 수행합니다.
+          BRANCH_VIOLATION=$(echo "$BRANCH_PERCENT 60.0" | awk '{if ($1 < $2) print "true"; else print "false"}')
+
+          if [ "$BRANCH_VIOLATION" = "true" ]; then
+            BODY+="🚨 **커버리지 기준 미달!**\n"
+            BODY+="> 브랜치 커버리지가 **${BRANCH_PERCENT}%** 로, 목표치인 **60%** 에 도달하지 못했습니다."
+          else
+            BODY+="✅ **커버리지 기준을 충족했습니다!**"
+          fi
+
+          # 생성된 메시지를 다음 스텝에서 사용할 수 있도록 출력 변수로 설정합니다.
+          echo "comment_body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "${BODY}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # 위에서 생성한 커스텀 메시지를 PR 코멘트로 게시
+      - name: Add Custom JaCoCo Report to PR
         if: always()
-        uses: madrapps/jacoco-report@v1.6.1
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "테스트 커버리지 리포트"
+          # 다른 코멘트와 겹치지 않도록 고유한 헤더를 사용합니다.
+          header: jacoco-coverage-report
+          message: ${{ steps.jacoco.outputs.comment_body }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
