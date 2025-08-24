@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserService userService;ㅇ
 
     @GetMapping("/user/info/{userId}") // GET 요청을 처리하며, {userId}는 동적인 경로 변수
     public ResponseEntity<String> getUserInfo(@PathVariable Long userId) {
