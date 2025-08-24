@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:integrationTest/application-integration.yml")
+@TestPropertySource("classpath:application-integration.yml")
 public class UserControllerIntegrationTest {
 
     @Container
