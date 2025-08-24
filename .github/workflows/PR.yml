@@ -158,12 +158,12 @@ jobs:
           name: jacoco-report
           path: build/reports/jacoco/test/html
 
-      # 9. 테스트 실행 결과를 PR 코멘트로 게시
+      # 9. 테스트 실행 결과를 workflow 탭에 추가
       - name: Report Test Results
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: JUnit Tests # 리포트 이름
+          name: JUnit Test Report # 리포트 이름
           path: "build/test-results/test/TEST-*.xml" # Gradle 테스트 결과 XML 파일 경로
           reporter: java-junit # 리포트 형식
           token: ${{ secrets.GITHUB_TOKEN }}
