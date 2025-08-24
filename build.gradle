@@ -38,16 +38,16 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
-    testImplementation 'org.mockito:mockito-core:5.12.0'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+//    testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.testcontainers:postgresql'
     // Testcontainers
     testImplementation 'org.testcontainers:junit-jupiter:1.20.3' // JUnit5용
     testImplementation 'org.testcontainers:postgresql:1.20.3'     // PostgreSQL 컨테이너
 
     // JUnit 5 Jupiter 엔진
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
@@ -68,8 +68,6 @@ tasks.named('test') {
 
 // JaCoCo 리포트 생성 작업(Task) 설정
 tasks.named('jacocoTestReport') {
-    // test 작업이 성공적으로 끝나야 이 작업이 실행됨
-//    dependsOn tasks.named('test')
 
     reports {
         // 리포트 형식 설정
