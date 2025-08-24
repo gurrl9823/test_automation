@@ -45,6 +45,29 @@ jobs:
         continue-on-error: true
         run: ./gradlew build -x test
 
+      # 빌드 성공 시 PR 코멘트 남기기
+      - name: Comment on Build Success
+        if: steps.build.outcome == 'success'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: build-status
+          message: |
+            ✅ **Gradle Build Succeeded!**
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 빌드 실패 시 PR 코멘트 남기기
+      - name: Comment on Build Failure
+        if: steps.build.outcome == 'failure'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: build-status
+          message: |
+            🚨 **Gradle Build Failed!**
+            
+            자세한 내용은 아래 링크에서 확인해주세요.
+            [View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # Gitleaks 실행 (Secret 하드코딩 탐지)
       - name: Run Gitleaks
         id: gitleaks
