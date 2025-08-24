@@ -5,8 +5,9 @@ on:
     branches: [ "master" ]
 
 permissions:
-  pull-requests: write # PR 코멘트를 작성하기 위해 필요
-  checks: write        # dorny/test-reporter가 체크를 생성하기 위해 필요
+  pull-requests: write   # PR 코멘트를 작성하기 위해 필요
+  checks: write          # dorny/test-reporter가 체크를 생성하기 위해 필요
+  security-events: write # Security 탭에 결과를 올리기 위해 필요
 
 jobs:
   build-and-scan:
@@ -46,6 +47,7 @@ jobs:
 
       # Gitleaks 실행 (Secret 하드코딩 탐지)
       - name: Run Gitleaks
+        id: gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

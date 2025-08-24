@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     public String getUserInfo(Long userId) {
+        String password = "123";
         return "홍길동 25세";
     }
 }
