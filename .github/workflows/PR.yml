@@ -35,17 +35,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # 4. Gradle Wrapper 실행 권한 부여
+      # 3. Gradle Wrapper 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # 5. Build (테스트 제외)
+      # 4. Build (테스트 제외)
       - name: Build with Gradle Wrapper
         id: build
         continue-on-error: true
         run: ./gradlew build -x test
 
-      # 빌드 성공 시 PR 코멘트 남기기
+      # 5. 빌드 성공 시 PR 코멘트 남기기
       - name: Comment on Build Success
         if: steps.build.outcome == 'success'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -55,7 +55,7 @@ jobs:
             ✅ **Gradle Build Succeeded!**
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 빌드 실패 시 PR 코멘트 남기기
+      # 6. 빌드 실패 시 PR 코멘트 남기기
       - name: Comment on Build Failure
         if: steps.build.outcome == 'failure'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -68,7 +68,7 @@ jobs:
             [View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Gitleaks 실행 (Secret 하드코딩 탐지)
+      # 7. Gitleaks 실행 (Secret 하드코딩 탐지)
       - name: Run Gitleaks
         id: gitleaks
         uses: gitleaks/gitleaks-action@v2
@@ -77,14 +77,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_EXIT_CODE: "0" # 시크릿을 찾아도 실패하지 않아야 다음 스텝 실행 가능
 
-      # Gitleaks 결과를 기록. PR 코멘트, PR Checks, Files changed
+      # 8. Gitleaks 결과를 기록. PR 코멘트, PR Checks, Files changed
       - name: Display Scan Results
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif # gitleaks-action의 기본 출력 파일 경로
 
-      # JSON 리포트를 읽고 코멘트 내용을 가공
+      # 9. Gitleaks 리포트를 읽고 코멘트 내용을 가공
       - name: Create Gitleaks PR Comment
         id: create_comment
         if: always()
@@ -113,7 +113,7 @@ jobs:
           echo -e "${BODY}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # Gitleaks 결과를 PR 코멘트로 게시
+      # 10. Gitleaks 결과를 PR 코멘트로 게시
       - name: PR Comment Gitleaks Result
         if: always()
         uses: marocchino/sticky-pull-request-comment@v2
@@ -122,7 +122,7 @@ jobs:
           message: ${{ steps.create_comment.outputs.comment_body }} # 이전 스텝에서 생성한 메시지를 사용 (path 대신 message)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 빌드 또는 보안점검 실패 시 바로 종료
+      # 11. 빌드 또는 보안점검 실패 시 바로 종료
       - name: Fail if Gitleaks or Build failed
         if: always()
         run: |
@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-scan
     steps:
-      # 1. 소스 코드 체크아웃
+      # 소스 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -145,7 +145,7 @@ jobs:
           # Gitleaks가 PR의 base commit을 찾기 위해 필수적입니다.
           fetch-depth: 0
 
-      # 2. JDK 21 설치
+      # JDK 21 설치
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -154,20 +154,19 @@ jobs:
 
       # gradle/actions/setup-gradle 사용 시 캐싱이 내장되어 있어 별도 cache 스텝이 불필요할 수 있습니다.
       # 공식 문서를 참고하여 중복 제거 가능
-      # 3. Setup Gradle
+      # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # 4. Gradle Wrapper 실행 권한 부여
+      # Gradle Wrapper 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # 6. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
+      # 12. 테스트 실행 (단위테스트 + 통합테스트 + 커버리지)
       - name: Run Tests
-        continue-on-error: true
         run: ./gradlew check --continue
 
-      # 7. index.html로 확인하기 위한 Test Report 업로드
+      # 13. index.html로 확인하기 위한 Test Report 업로드
       - name: Upload Test Report
         if: always() # 테스트가 실패하더라도 항상 리포트를 업로드
         uses: actions/upload-artifact@v4
@@ -175,7 +174,7 @@ jobs:
           name: test-report
           path: build/reports/tests/test/
 
-      # 8. 커버리지 리포트 업로드
+      # 14. 커버리지 리포트 업로드
       - name: Upload JaCoCo Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -183,7 +182,7 @@ jobs:
           name: jacoco-report
           path: build/reports/jacoco/test/html
 
-      # 9. 테스트 실행 결과를 workflow 탭에 추가
+      # 15. 테스트 실행 결과를 workflow 탭에 추가
       - name: Report Test Results
         if: always()
         uses: dorny/test-reporter@v1
@@ -194,7 +193,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
 
-#      # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
+#      # JaCoCo 커버리지 리포트를 PR 코멘트로 게시
 #      - name: Add JaCoCo Report to PR
 #        id: jacoco
 #        if: always()
@@ -204,14 +203,14 @@ jobs:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          title: "테스트 커버리지 리포트"
 
-      # JaCoCo XML 리포트 파싱에 필요한 xmllint 도구 설치
+      # 16. JaCoCo XML 리포트 파싱에 필요한 xmllint 도구 설치
       - name: Install xmllint
         if: always()
         run: |
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
 
-      # JaCoCo XML 리포트를 직접 파싱하여 커버리지 계산
+      # 17. JaCoCo XML 리포트를 직접 파싱하여 커버리지 계산
       - name: Parse JaCoCo Coverage Report
         id: jacoco
         if: always() # 테스트 실패 여부와 관계없이 항상 실행
@@ -260,7 +259,7 @@ jobs:
           echo -e "${BODY}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # 위에서 생성한 커스텀 메시지를 PR 코멘트로 게시
+      # 18. 위에서 생성한 커스텀 메시지를 PR 코멘트로 게시
       - name: Add Custom JaCoCo Report to PR
         if: always()
         uses: marocchino/sticky-pull-request-comment@v2
