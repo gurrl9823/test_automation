@@ -51,6 +51,40 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_REPORT_FORMAT: json
+          GITLEAKS_REPORT_PATH: gitleaks-report.json
+          GITLEAKS_EXIT_CODE: "0" # 시크릿을 찾아도 실패하지 않아야 다음 스텝 실행 가능
+
+      # Gitleaks 결과를 GitHub Security 탭에 업로드
+      - name: Upload Gitleaks report to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif # gitleaks-action의 기본 출력 파일 경로
+
+      # JSON 리포트를 읽고 코멘트 내용을 가공
+      - name: Create Comment Body
+        id: create_comment
+        run: |
+          # gitleaks-report.json 파일에서 발견된 leak 개수를 확인
+          LEAKS_COUNT=$(jq 'length' gitleaks-report.json)
+
+          if [ $LEAKS_COUNT -eq 0 ]; then
+            # Leak이 없으면 성공 메시지 작성
+            BODY="✅ Gitleaks scan passed. No secrets found."
+          else
+            # Leak이 있으면 요약 정보 생성
+            BODY="🚨 Gitleaks scan failed! Found ${LEAKS_COUNT} potential secret(s).\n\n"
+            BODY+="| File | Line | Rule |\n"
+            BODY+="|------|------|------|\n"
+            # jq를 사용해 각 leak 정보를 테이블 형식으로 추가
+            BODY+=$(jq -r '.[] | "| \(.File) | \(.StartLine) | \(.RuleID) |"' gitleaks-report.json)
+          fi
+          
+          # 생성된 메시지를 GitHub Actions의 출력 변수로 설정
+          # 줄바꿈 문자를 URL 인코딩(%0A)으로 변경해야 여러 줄 메시지 전달 가능
+          echo "comment_body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "${BODY}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       # Gitleaks 결과를 PR 코멘트로 게시
       - name: Comment Gitleaks Result
@@ -58,7 +92,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: gitleaks-result # 코멘트 상단에 표시될 헤더
-          path: results.sarif # Gitleaks 스텝에서 생성된 SARIF 리포트 파일 경로
+          message: ${{ steps.create_comment.outputs.comment_body }} # 이전 스텝에서 생성한 메시지를 사용 (path 대신 message)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 빌드 또는 보안점검 실패 시 바로 종료
