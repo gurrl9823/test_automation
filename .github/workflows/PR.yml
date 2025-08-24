@@ -203,6 +203,12 @@ jobs:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          title: "테스트 커버리지 리포트"
 
+      # JaCoCo XML 리포트 파싱에 필요한 xmllint 도구 설치
+      - name: Install xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+
       # JaCoCo XML 리포트를 직접 파싱하여 커버리지 계산
       - name: Parse JaCoCo Coverage Report
         id: jacoco
