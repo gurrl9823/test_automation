@@ -16,6 +16,11 @@ jobs:
       # 1. 소스 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # 0으로 설정하면 전체 Git 히스토리를 가져옵니다.
+          # Gitleaks가 PR의 base commit을 찾기 위해 필수적입니다.
+          fetch-depth: 0
+
 
       # 2. JDK 21 설치
       - name: Set up JDK 21
