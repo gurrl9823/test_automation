@@ -21,7 +21,6 @@ jobs:
           # Gitleaks가 PR의 base commit을 찾기 위해 필수적입니다.
           fetch-depth: 0
 
-
       # 2. JDK 21 설치
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -56,9 +55,9 @@ jobs:
         if: always()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: gitleaks
-          path: gitleaks-report.json
-          token: ${{ secrets.GITHUB_TOKEN }}
+          header: gitleaks-result # 코멘트 상단에 표시될 헤더
+          path: results.sarif # Gitleaks 스텝에서 생성된 SARIF 리포트 파일 경로
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 빌드 또는 보안점검 실패 시 바로 종료
       - name: Fail if Gitleaks or Build failed
