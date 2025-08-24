@@ -50,7 +50,7 @@ jobs:
           name: test-report
           path: build/reports/tests/test/
 
-      # 8. 테스트 리포트 업로드
+      # 8. 커버리지 리포트 업로드
       - name: Upload JaCoCo Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -67,12 +67,12 @@ jobs:
           path: "build/test-results/test/TEST-*.xml" # Gradle 테스트 결과 XML 파일 경로
           reporter: java-junit # 리포트 형식
           token: ${{ secrets.GITHUB_TOKEN }}
-          pr-comment: true
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
 
       # 10. JaCoCo 커버리지 리포트를 PR 코멘트로 게시
       - name: Add JaCoCo Report to PR
         id: jacoco
+        if: always()
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
