@@ -46,9 +46,7 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         continue-on-error: true
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          report_format: json
-          report_path: gitleaks-report.json
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Gitleaks 결과를 PR 코멘트로 게시
       - name: Comment Gitleaks Result
