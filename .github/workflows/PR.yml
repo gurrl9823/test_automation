@@ -45,8 +45,13 @@ jobs:
         id: gitleaks
         uses: gitleaks/gitleaks-action@v2
         continue-on-error: true
-        with:
-          args: detect --source . --report-path gitleaks-report.json --report-format json --verbose
+        run: |
+          gitleaks detect \
+            --source . \
+            --report-path gitleaks-report.json \
+            --report-format json \
+            --verbose \
+            --github-token ${{ secrets.GITHUB_TOKEN }}
 
       # Gitleaks 결과를 PR 코멘트로 게시
       - name: Comment Gitleaks Result
