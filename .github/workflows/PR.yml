@@ -54,14 +54,14 @@ jobs:
           GITLEAKS_EXIT_CODE: "0" # 시크릿을 찾아도 실패하지 않아야 다음 스텝 실행 가능
 
       # Gitleaks 결과를 GitHub Security 탭에 업로드
-      - name: Upload Gitleaks report to GitHub
+      - name: Upload Gitleaks report to GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif # gitleaks-action의 기본 출력 파일 경로
 
       # JSON 리포트를 읽고 코멘트 내용을 가공
-      - name: Create Comment Body
+      - name: Create Gitleaks PR Comment
         id: create_comment
         if: always()
         run: |
@@ -84,12 +84,13 @@ jobs:
             # jq를 사용해 SARIF 파일에서 각 leak 정보를 테이블 형식으로 추가 (jq 쿼리 변경)
             BODY+=$(jq -r '.runs[0].results[] | "| \(.locations[0].physicalLocation.artifactLocation.uri) | \(.locations[0].physicalLocation.region.startLine) | \(.ruleId) |"' results.sarif)
           fi
+          
           echo "comment_body<<EOF" >> $GITHUB_OUTPUT
           echo -e "${BODY}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       # Gitleaks 결과를 PR 코멘트로 게시
-      - name: Comment Gitleaks Result
+      - name: PR Comment Gitleaks Result
         if: always()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
