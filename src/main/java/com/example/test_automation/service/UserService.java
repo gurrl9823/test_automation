@@ -9,10 +9,10 @@ public class UserService {
 
         String a = "A";
         String b = "B";
-        String c = "C";
-        if("aaa".equals(a) && "bbb".equals(b)) {
-            c = "ccc";
-        }
+        String c = "C";ㅇ
+//        if("aaa".equals(a) && "bbb".equals(b)) {
+//            c = "ccc";
+//        }
 
         String userKey = "123";
         return "홍길동 25세";
