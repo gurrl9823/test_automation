@@ -5,8 +5,8 @@ on:
     branches: [ "master" ]
 
 permissions:
-  pull-requests: write   # PR 코멘트를 작성하기 위해 필요
-  checks: write          # dorny/test-reporter가 체크를 생성하기 위해 필요
+  pull-requests: write # PR 코멘트를 작성하기 위해 필요
+  checks: write        # dorny/test-reporter가 체크를 생성하기 위해 필요
 
 jobs:
   build-and-scan:
@@ -40,7 +40,7 @@ jobs:
         run: chmod +x ./gradlew
 
       # 4. Build (테스트 제외)
-      - name: Build with Gradle Wrapper
+      - name: Build
         id: build
         continue-on-error: true
         run: ./gradlew build -x test
@@ -192,16 +192,6 @@ jobs:
           reporter: java-junit # 리포트 형식
           token: ${{ secrets.GITHUB_TOKEN }}
           fail-on-error: 'false' # 테스트 실패 시 여기서 워크플로우를 중단하지 않음
-
-#      # JaCoCo 커버리지 리포트를 PR 코멘트로 게시
-#      - name: Add JaCoCo Report to PR
-#        id: jacoco
-#        if: always()
-#        uses: madrapps/jacoco-report@v1.6.1
-#        with:
-#          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          title: "테스트 커버리지 리포트"
 
       # 16. JaCoCo XML 리포트 파싱에 필요한 xmllint 도구 설치
       - name: Install xmllint
